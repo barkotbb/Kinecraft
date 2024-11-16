@@ -1,0 +1,5 @@
+C:/Users/barko/source/repos/Kinecraft1/out/build/x64-debug/CMakeFiles/edit_cache.dir
+C:/Users/barko/source/repos/Kinecraft1/out/build/x64-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/barko/source/repos/Kinecraft1/out/build/x64-debug/Kinecraft1/CMakeFiles/Kinecraft1.dir
+C:/Users/barko/source/repos/Kinecraft1/out/build/x64-debug/Kinecraft1/CMakeFiles/edit_cache.dir
+C:/Users/barko/source/repos/Kinecraft1/out/build/x64-debug/Kinecraft1/CMakeFiles/rebuild_cache.dir
