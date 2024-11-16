@@ -5,32 +5,31 @@
 
 
 float vertices[]{
-	0.5, 0.5, 0.0,
-	0.5, -0.5, 0.0,
-	-0.5, -0.5, 0.0,
-	-0.5, 0.5, 0.0
+	-0.5f, -0.5f, 0.0f,
+	 0.5f, -0.5f, 0.0f,
+	 0.0f,  0.5f, 0.0f
 };
 
-unsigned int indices[] = {
-	0, 1, 3,
-	1, 2, 3
-};
 
 unsigned int VBO;
 unsigned int VAO;
-unsigned int EBO;
 
-const char* vertexShaderSource = "#version 330 core\n"
-"layout(location = 0) in vec3 aPos;\n"
+const char* vertexShaderSource = "#version 330\n"
+"layout (location = 0) in vec3 aPos;\n"
+"out vec4 vertexColor;"
 "void main() {\n"
-"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"	gl_Position= vec4(aPos, 1.0);\n"
+"	vertexColor= vec4(1.0, 0.0, 0.0, 1.0);\n"
 "}\0";
 
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
+const char* fragmentShaderSource = "#version 330\n"
+"out vec4 FragColor;"
+
+"uniform vec4 ourColor;"
 "void main() {\n"
-"	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);"
+"	FragColor = ourColor;\n"
 "}\0";
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
@@ -51,26 +50,22 @@ int main() {
 
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Kinecraft", NULL, NULL);
 	if (window == NULL) {
-		std::cout << "Failed to create GLFW window.\n";
+		std::cout << "Kinecraft >> Failed to create GLFW window.\n";
 		glfwTerminate();
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize GLAD\n";
+		std::cout << "Kinecraft >> Failed to initialize GLAD\n";
 		return -1;
 	}
 	glViewport(0, 0, 800, 600);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &EBO);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	// vertex Shader
 	unsigned int vertexShader;
@@ -83,7 +78,7 @@ int main() {
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "Error while compiling the shader\n" << infoLog << std::endl;
+		std::cout << "Kinecraft >> Error while compiling the shader\n" << infoLog << std::endl;
 	}
 
 	// Fragment Shader
@@ -94,7 +89,7 @@ int main() {
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "Error while compiling the shader fragment\n" << infoLog << std::endl;
+		std::cout << "Kinecraft >> Error while compiling the shader fragment\n" << infoLog << std::endl;
 	}
 
 	unsigned int shaderProgram;
@@ -107,7 +102,7 @@ int main() {
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "Error while compiling the shader shaderProgram\n" << infoLog << std::endl;
+		std::cout << "Kinecraft >> Error while compiling the shader shaderProgram\n" << infoLog << std::endl;
 	}
 
 
@@ -116,24 +111,32 @@ int main() {
 
 	int nrAttributes;
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-	std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+	std::cout << "Kinecraft >> Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
 
-	while (!glfwWindowShouldClose(window)) {
-		// Input handling
-		processInput(window);
 
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
 
-		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+		while (!glfwWindowShouldClose(window)) {
+			// Input handling
+			processInput(window);
 
-		// check and call events and swap the buffers
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
+			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			glUseProgram(shaderProgram);
+
+
+			float timeValue = glfwGetTime();
+			float greenValue = sin(timeValue / 2.0) + 0.5;
+			int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+			std::cout << "Green Value: " << greenValue << "\nOurColor Value: " << vertexColorLocation << std::endl;
+			glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+			glBindVertexArray(VAO);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+
+			// check and call events and swap the buffers
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	glfwTerminate();
